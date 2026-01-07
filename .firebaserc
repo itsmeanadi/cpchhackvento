@@ -1,8 +1,7 @@
-# .firebaserc - Firebase Project Configuration
-# This file specifies which Firebase project to use for deployments
-
 {
   "projects": {
-    "default": "anadi-4b750"
-  }
+    "anadi": "anadi-4b750"
+  },
+  "targets": {},
+  "etags": {}
 }
