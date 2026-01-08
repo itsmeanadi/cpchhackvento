@@ -3,9 +3,14 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export default async function middleware(request: NextRequest) {
+  // Explicitly handle secure cookie logic for Vercel deployments
+  // This helps when NEXTAUTH_URL might not be perfectly propagated to Edge Runtime
+  const secureCookie = process.env.NODE_ENV === "production";
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    secureCookie,
   });
 
   const isLoggedIn = !!token;

@@ -5,14 +5,17 @@ import { GoogleSignInButton } from "./google-button"; // Client component below
 export default async function LoginPage() {
   const session = await auth();
 
-  // Server-side redirect if already logged in
+  /* 
+  // Redundant redirect handled by middleware. 
+  // keeping this commented out to prevent infinite loops if middleware / page session states drift.
   if (session?.user) {
     if (session.user.role === "admin") {
       redirect("/admin");
     } else {
       redirect("/dashboard");
     }
-  }
+  } 
+  */
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
