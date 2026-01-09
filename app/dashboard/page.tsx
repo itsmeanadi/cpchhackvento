@@ -2,7 +2,8 @@ import { auth } from "@/auth";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { getAllJobs } from "@/lib/jobs";
 import { Navbar } from "@/components/navbar";
-import { Briefcase, Calendar, CheckCircle, AlertTriangle, ArrowRight, Download, Sparkles } from "lucide-react";
+import { ApplyButton } from "@/components/apply-button";
+import { Briefcase, Calendar, UserCheck, Sparkles, ArrowUpRight, Search } from "lucide-react";
 
 export default async function StudentDashboard() {
   const session = await auth();
@@ -16,16 +17,10 @@ export default async function StudentDashboard() {
 
   // Determine if Guest
   const isGuest = session.user.email === "guest_student@example.com";
-
   let userData;
 
   if (isGuest) {
-    userData = {
-      name: "Guest Student",
-      isProfileComplete: true,
-      branch: "Computer Science",
-      cgpa: 8.5,
-    };
+    userData = { name: "Guest Student", isProfileComplete: true };
   } else {
     const adminDb = getAdminDb();
     const userRef = adminDb.collection("users").doc(session.user.email!);
@@ -33,168 +28,160 @@ export default async function StudentDashboard() {
     userData = userSnap.data();
   }
 
+  const userSkills = (userData?.skills || []) as string[];
   const isProfileComplete = userData?.isProfileComplete;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-indigo-500/30">
 
       <Navbar user={session.user} />
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* Header Section - Simplified */}
-        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        {/* Welcome Header */}
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-800 pb-8">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white mb-2">
+            <h1 className="text-3xl font-medium tracking-tight text-white mb-2">
               Welcome back, {userData?.name?.split(' ')[0]}
             </h1>
             <p className="text-neutral-400">
-              Here's what's happening today in your placement journey.
+              Track your applications and explore new opportunities.
             </p>
           </div>
 
-          <div className="flex flex-col items-start md:items-end gap-3">
-            <div className="flex gap-2">
-              <a
-                href="/dashboard/resume"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
-              >
-                <Sparkles size={16} />
-                AI Resume Doctor
-              </a>
-              <a
-                href="/profile/edit"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors border border-neutral-700"
-              >
-                Edit Profile
-              </a>
-            </div>
-
-            {!isProfileComplete && (
-              <div className="bg-amber-900/20 border border-amber-900/50 rounded-lg p-4 flex items-start gap-3 max-w-md">
-                <AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-amber-500">Complete Profile</p>
-                  <p className="text-sm text-amber-500/80 mt-1">
-                    Please <a href="/profile/edit" className="underline hover:text-amber-400">update your academic details</a> to apply for jobs.
-                  </p>
-                </div>
-              </div>
-            )}
+          <div className="flex gap-3">
+            <a href="/dashboard/resume" className="flex items-center gap-2 px-4 py-2 bg-white text-black text-sm font-medium rounded-md hover:bg-neutral-200 transition-colors">
+              <Sparkles size={16} className="text-indigo-600" />
+              AI Resume Review
+            </a>
+            <a href="/profile/edit" className="flex items-center gap-2 px-4 py-2 bg-neutral-900 text-neutral-300 text-sm font-medium rounded-md border border-neutral-800 hover:text-white transition-colors">
+              Edit Profile
+            </a>
           </div>
-        </header>
-
-        {/* Stats Grid - Cleaner, Solid Cards */}
-        <div className="grid gap-4 md:grid-cols-3 mb-10">
-          {[
-            {
-              label: "Applications",
-              value: "3",
-              icon: Briefcase,
-              color: "text-neutral-400"
-            },
-            {
-              label: "Interviews",
-              value: "1",
-              icon: Calendar,
-              color: "text-neutral-400"
-            },
-            {
-              label: "Profile",
-              value: isProfileComplete ? "Ready" : "Incomplete",
-              icon: isProfileComplete ? CheckCircle : AlertTriangle,
-              color: isProfileComplete ? "text-emerald-500" : "text-amber-500"
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 transition-all hover:bg-neutral-900/80"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-medium text-neutral-400">{stat.label}</p>
-                <stat.icon size={18} className={stat.color} />
-              </div>
-              <p className="text-3xl font-semibold text-white">{stat.value}</p>
-            </div>
-          ))}
         </div>
 
-        {/* Job Listings - Modern List View */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-white">Open Opportunities</h3>
-            <button className="text-sm text-neutral-400 hover:text-white transition-colors">
-              View All &rarr;
-            </button>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
+                <Briefcase size={18} />
+              </div>
+              <span className="text-sm font-medium text-neutral-400">Active Applications</span>
+            </div>
+            <p className="text-2xl font-semibold pl-1">3</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
+                <Calendar size={18} />
+              </div>
+              <span className="text-sm font-medium text-neutral-400">Interviews Scheduled</span>
+            </div>
+            <p className="text-2xl font-semibold pl-1">1</p>
+          </div>
 
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
+          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
+                <UserCheck size={18} />
+              </div>
+              <span className="text-sm font-medium text-neutral-400">Profile Status</span>
+            </div>
+            <p className={`text-sm font-medium pl-1 ${isProfileComplete ? 'text-emerald-500' : 'text-amber-500'}`}>
+              {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
+            </p>
+          </div>
+        </div>
+
+        {/* Job Listing Heading */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Latest Opportunities</h2>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
+            <input
+              type="text"
+              placeholder="Search roles..."
+              className="bg-neutral-900 border border-neutral-800 rounded-md py-2 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-neutral-600 w-64"
+            />
+          </div>
+        </div>
+
+        {/* Job Grid */}
+        <div className="grid grid-cols-1 gap-4">
+          {jobs.length > 0 ? (
+            jobs.map((job) => {
+              const isMatch = userSkills.some(us =>
+                job.skills?.some(js => js.toLowerCase().includes(us.toLowerCase()) || us.toLowerCase().includes(js.toLowerCase()))
+              );
+
+              return (
                 <div
                   key={job.id}
-                  className="group bg-neutral-900 border border-neutral-800 rounded-xl p-5 hover:border-neutral-700 transition-all flex flex-col sm:flex-row gap-6 items-start sm:items-center"
+                  className={`group relative bg-neutral-900/30 border border-neutral-800 rounded-lg p-6 hover:bg-neutral-900/50 transition-all ${isMatch ? 'ring-1 ring-indigo-500/20 bg-indigo-500/5' : ''}`}
                 >
-                  {/* Icon Placeholder or Company Logo */}
-                  <div className="h-12 w-12 rounded-lg bg-neutral-800 flex items-center justify-center shrink-0 font-bold text-lg text-neutral-400">
-                    {job.companyName.charAt(0)}
-                  </div>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3">
-                      <h4 className="text-lg font-medium text-white truncate">{job.companyName}</h4>
-                      {/* Status Chip */}
-                      <span className="text-[10px] font-medium bg-green-500/10 text-green-500 px-2 py-0.5 rounded uppercase tracking-wide">
-                        Active
-                      </span>
+                    <div className="flex items-start gap-4">
+                      <div className="h-12 w-12 rounded-md bg-white flex items-center justify-center text-lg font-bold text-black border border-neutral-200">
+                        {job.companyName.charAt(0)}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-lg text-white">{job.companyName}</h3>
+                          {isMatch && (
+                            <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-medium border border-indigo-500/20">
+                              Recommended
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-neutral-400 text-sm mt-0.5">{job.role}</p>
+
+                        <div className="flex items-center gap-4 mt-3 text-sm text-neutral-500">
+                          <span className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-600"></div>
+                            CGPA {job.cgpa}+
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-600"></div>
+                            {job.ctc}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-600"></div>
+                            Posted {job.date}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-neutral-400 text-sm mt-1">{job.role}</p>
 
-                    <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-neutral-500 font-medium">
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
-                        Min CGPA: {job.cgpa}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
-                        CTC: {job.ctc}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
-                        Date: {job.date}
-                      </span>
+                    <div className="flex items-center gap-3 pl-16 md:pl-0">
+                      {job.documentUrl ? (
+                        <a
+                          href={job.documentUrl}
+                          target="_blank"
+                          className="px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white border border-neutral-800 rounded-md hover:bg-neutral-800 transition-colors"
+                        >
+                          View Details
+                        </a>
+                      ) : (
+                        <ApplyButton jobId={job.id} />
+                      )}
                     </div>
-                  </div>
 
-                  <div className="self-end sm:self-center">
-                    {job.documentUrl ? (
-                      <a
-                        href={job.documentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 rounded-lg bg-neutral-100 text-black text-sm font-medium hover:bg-white transition-colors flex items-center gap-2"
-                      >
-                        <Download size={14} />
-                        Details
-                      </a>
-                    ) : (
-                      <button className="px-5 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-neutral-200 transition-colors">
-                        Apply Now
-                      </button>
-                    )}
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-16 border border-dashed border-neutral-800 rounded-xl">
-                <p className="text-neutral-500">No active job posts found.</p>
-              </div>
-            )}
-
-          </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-20 border border-dashed border-neutral-800 rounded-lg">
+              <p className="text-neutral-500">No active positions available at this moment.</p>
+            </div>
+          )}
         </div>
+
       </main>
     </div>
-  )
+  );
 }

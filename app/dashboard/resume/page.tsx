@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Navbar } from "@/components/navbar";
-import { Upload, FileText, CheckCircle, AlertTriangle, XCircle, ArrowRight, Loader2, Sparkles, Wand2 } from "lucide-react";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function ResumeAnalyzerPage() {
     const { data: session } = useSession();
@@ -37,165 +36,167 @@ export default function ResumeAnalyzerPage() {
                 body: formData,
             });
 
-            const responseText = await res.text();
-            console.log("Raw Server Response:", responseText.slice(0, 500)); // Log first 500 chars
-
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (jsonError) {
-                console.error("JSON Parse Error:", jsonError);
-                throw new Error(`Server returned invalid response (Status ${res.status}): ${responseText.slice(0, 100)}...`);
-            }
+            const data = await res.json();
 
             if (!res.ok) {
                 throw new Error(data.error || "Analysis failed");
             }
 
             setResult(data.analysis);
+
         } catch (err: any) {
-            console.error("Upload Error:", err);
             setError(err.message);
         } finally {
             setIsAnalyzing(false);
         }
     };
 
+    // Circular Progress Component
+    const ScoreCircle = ({ score }: { score: number }) => {
+        const radius = 40;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (score / 100) * circumference;
+
+        let color = "text-red-500";
+        if (score > 50) color = "text-amber-500";
+        if (score > 75) color = "text-emerald-500";
+
+        return (
+            <div className="relative h-32 w-32 flex items-center justify-center">
+                <svg className="transform -rotate-90 w-full h-full">
+                    <circle className="text-neutral-800" strokeWidth="8" stroke="currentColor" fill="transparent" r={radius} cx="64" cy="64" />
+                    <circle
+                        className={`${color} transition-all duration-1000 ease-out`}
+                        strokeWidth="8"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={offset}
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r={radius}
+                        cx="64"
+                        cy="64"
+                    />
+                </svg>
+                <div className="absolute flex flex-col items-center">
+                    <span className="text-3xl font-bold text-white">{score}</span>
+                    <span className="text-xs text-neutral-500 uppercase">Score</span>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="min-h-screen bg-neutral-950 text-white">
+        <div className="min-h-screen bg-[#050505] text-white font-sans">
             <Navbar user={session?.user || { name: "Student", role: "student" }} />
 
-            <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+            <main className="max-w-4xl mx-auto px-6 py-12">
 
                 {/* Header */}
-                <div className="mb-10 text-center">
-                    <div className="inline-flex items-center justify-center p-2 rounded-full bg-indigo-500/10 mb-4 ring-1 ring-indigo-500/30">
-                        <Sparkles size={20} className="text-indigo-400" />
-                    </div>
-                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-                        AI Resume Doctor
-                    </h1>
-                    <p className="text-neutral-400 max-w-2xl mx-auto text-lg">
-                        Upload your resume (PDF/DOCX) and let our Gemini-powered AI analyze it for ATS compatibility, content strength, and formatting improvements.
+                <div className="text-center mb-12">
+                    <h1 className="text-3xl font-semibold mb-3">AI Resume Review</h1>
+                    <p className="text-neutral-400 max-w-xl mx-auto">
+                        Optimize your resume for ATS algorithms and get actionable feedback to improve your hiring chances.
                     </p>
                 </div>
 
                 {/* Upload Section */}
-                <div className="max-w-xl mx-auto mb-12">
-                    <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 text-center hover:border-neutral-700 transition-colors relative group">
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-10 transition-all hover:border-neutral-700">
+                    <div className="border-2 border-dashed border-neutral-700 rounded-lg p-10 text-center relative hover:bg-neutral-800/50 transition-colors">
                         <input
                             type="file"
                             accept=".pdf,.docx,.txt"
                             onChange={handleFileChange}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
-
-                        <div className="pointer-events-none">
-                            <div className="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-neutral-700 transition-colors">
-                                {file ? <FileText size={32} className="text-indigo-400" /> : <Upload size={32} className="text-neutral-500" />}
+                        <div className="flex flex-col items-center pointer-events-none">
+                            <div className="h-12 w-12 bg-neutral-800 rounded-full flex items-center justify-center mb-4 text-neutral-400">
+                                {file ? <FileText size={24} /> : <Upload size={24} />}
                             </div>
-                            {file ? (
-                                <div>
-                                    <p className="text-lg font-medium text-white">{file.name}</p>
-                                    <p className="text-sm text-neutral-500 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
-                                </div>
-                            ) : (
-                                <div>
-                                    <p className="text-lg font-medium text-white">Drop your resume here</p>
-                                    <p className="text-sm text-neutral-500 mt-1">Supports PDF, DOCX, TXT</p>
-                                </div>
-                            )}
+                            <h3 className="text-lg font-medium text-white mb-1">
+                                {file ? file.name : "Upload your resume"}
+                            </h3>
+                            <p className="text-sm text-neutral-500">
+                                {file ? "Ready to analyze" : "Drag and drop or click to browse (PDF, DOCX)"}
+                            </p>
                         </div>
                     </div>
 
                     {file && !isAnalyzing && !result && (
-                        <button
-                            onClick={handleAnalyze}
-                            className="w-full mt-4 bg-white text-black font-bold py-3 rounded-xl hover:bg-neutral-200 transition-all flex items-center justify-center gap-2"
-                        >
-                            <Wand2 size={18} />
-                            Analyze Resume
-                        </button>
+                        <div className="mt-6 flex justify-center">
+                            <button
+                                onClick={handleAnalyze}
+                                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2"
+                            >
+                                Start Analysis
+                            </button>
+                        </div>
                     )}
 
                     {isAnalyzing && (
-                        <button disabled className="w-full mt-4 bg-neutral-800 text-neutral-400 font-medium py-3 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <Loader2 size={18} className="animate-spin" />
-                            Analyzing with Gemini...
-                        </button>
+                        <div className="mt-8 text-center">
+                            <Loader2 size={24} className="animate-spin mx-auto text-indigo-500 mb-2" />
+                            <p className="text-sm text-neutral-400">Analyzing content structure and keywords...</p>
+                        </div>
                     )}
 
                     {error && (
-                        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
-                            <XCircle size={20} className="shrink-0" />
-                            <p className="text-sm">{error}</p>
+                        <div className="mt-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-center gap-3 text-red-400 justify-center">
+                            <XCircle size={18} />
+                            <span className="text-sm">{error}</span>
                         </div>
                     )}
                 </div>
 
                 {/* Results Section */}
                 {result && (
-                    <div className="animate-slide-up space-y-8">
+                    <div className="space-y-8 animate-fade-in">
 
-                        {/* Score Card */}
-                        <div className="grid md:grid-cols-3 gap-6">
-                            <div className="md:col-span-1 bg-neutral-900 border border-neutral-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                                <div className="relative w-32 h-32 mb-4 flex items-center justify-center">
-                                    <svg className="w-full h-full transform -rotate-90">
-                                        <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-neutral-800" />
-                                        <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="transparent" className={result.score > 75 ? "text-green-500" : result.score > 50 ? "text-amber-500" : "text-red-500"} strokeDasharray={351} strokeDashoffset={351 - (351 * result.score) / 100} strokeLinecap="round" />
-                                    </svg>
-                                    <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                        <span className="text-4xl font-bold text-white">{result.score}</span>
-                                        <span className="text-xs text-neutral-500 uppercase tracking-wider">Score</span>
-                                    </div>
+                        {/* Summary Card */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="col-span-1 bg-neutral-900 border border-neutral-800 rounded-xl p-6 flex flex-col items-center justify-center">
+                                <ScoreCircle score={result.score} />
+                                <div className="mt-4 text-center">
+                                    <p className="font-medium text-white">ATS Compatibility</p>
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        {result.score > 70 ? "Ready for submission" : "Needs Improvement"}
+                                    </p>
                                 </div>
-                                <h3 className="text-lg font-medium text-white mb-1">ATS Compatibility</h3>
-                                <p className="text-sm text-neutral-500">
-                                    {result.score > 75 ? "Excellent! Ready for applications." : result.score > 50 ? "Good start, needs refinement." : "Needs significant improvement."}
-                                </p>
                             </div>
 
-                            <div className="md:col-span-2 bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
-                                <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                                    <FileText size={18} className="text-indigo-400" />
-                                    Professional Summary
-                                </h3>
-                                <p className="text-neutral-300 leading-relaxed bg-neutral-950/50 p-4 rounded-xl border border-neutral-800/50">
+                            <div className="col-span-2 bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+                                <h3 className="font-medium text-white mb-4">Professional Overview</h3>
+                                <p className="text-sm text-neutral-300 leading-relaxed">
                                     {result.summary}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Analysis Grid */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Strengths */}
-                            <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
-                                <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                                    <CheckCircle size={18} className="text-green-500" />
-                                    Key Strengths
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+                                <h3 className="font-medium text-white mb-4 flex items-center gap-2">
+                                    <CheckCircle size={18} className="text-emerald-500" /> Strengths
                                 </h3>
                                 <ul className="space-y-3">
-                                    {result.strengths.map((item: string, i: number) => (
-                                        <li key={i} className="flex items-start gap-3 text-sm text-neutral-300">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0"></span>
-                                            {item}
+                                    {result.strengths.map((s: string, i: number) => (
+                                        <li key={i} className="text-sm text-neutral-300 flex items-start gap-3">
+                                            <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full mt-1.5 shrink-0"></span>
+                                            {s}
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            {/* Weaknesses */}
-                            <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
-                                <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                                    <AlertTriangle size={18} className="text-amber-500" />
-                                    Areas for Improvement
+                            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+                                <h3 className="font-medium text-white mb-4 flex items-center gap-2">
+                                    <AlertTriangle size={18} className="text-amber-500" /> Improvements
                                 </h3>
                                 <ul className="space-y-3">
-                                    {result.weaknesses.map((item: string, i: number) => (
-                                        <li key={i} className="flex items-start gap-3 text-sm text-neutral-300">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0"></span>
-                                            {item}
+                                    {result.weaknesses.map((w: string, i: number) => (
+                                        <li key={i} className="text-sm text-neutral-300 flex items-start gap-3">
+                                            <span className="h-1.5 w-1.5 bg-amber-500 rounded-full mt-1.5 shrink-0"></span>
+                                            {w}
                                         </li>
                                     ))}
                                 </ul>
@@ -203,27 +204,18 @@ export default function ResumeAnalyzerPage() {
                         </div>
 
                         {/* Suggestions */}
-                        <div className="bg-indigo-950/10 border border-indigo-500/20 rounded-2xl p-8">
-                            <h3 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                                <Wand2 size={24} className="text-indigo-400" />
-                                AI Recommended Fixes
-                            </h3>
-                            <div className="space-y-4">
-                                {result.suggestions.map((suggestion: string, i: number) => (
-                                    <div key={i} className="flex gap-4 p-4 bg-neutral-950/50 rounded-xl border border-indigo-500/10 hover:border-indigo-500/30 transition-colors">
-                                        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm">
+                        <div className="bg-indigo-900/10 border border-indigo-500/10 rounded-xl p-6">
+                            <h3 className="font-medium text-white mb-4">Recommended Actions</h3>
+                            <div className="space-y-3">
+                                {result.suggestions.map((s: string, i: number) => (
+                                    <div key={i} className="flex gap-4 p-3 bg-neutral-900/50 rounded-lg">
+                                        <span className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold">
                                             {i + 1}
                                         </span>
-                                        <p className="text-neutral-200 text-sm leading-relaxed pt-1.5">{suggestion}</p>
+                                        <p className="text-sm text-neutral-300 pt-0.5">{s}</p>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-
-                        <div className="text-center pt-8">
-                            <Link href="/dashboard" className="text-neutral-500 hover:text-white transition-colors text-sm">
-                                &larr; Back to Dashboard
-                            </Link>
                         </div>
 
                     </div>
