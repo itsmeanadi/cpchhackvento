@@ -39,17 +39,17 @@ export default async function StudentDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Welcome Header */}
-        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-800 pb-8">
-          <div>
-            <h1 className="text-3xl font-medium tracking-tight text-white mb-2">
-              Welcome back, {userData?.name?.split(' ')[0]}
-            </h1>
-            <p className="text-neutral-400">
-              Track your applications and explore new opportunities.
-            </p>
-          </div>
+        <div className="mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-800 pb-8">
+            <div>
+              <h1 className="text-3xl font-medium tracking-tight text-white mb-2">
+                Welcome back, {userData?.name?.split(' ')[0]}
+              </h1>
+              <p className="text-neutral-400">
+                Track your applications and explore new opportunities.
+              </p>
+            </div>
 
-          <div className="flex flex-col items-start md:items-end gap-3">
             <div className="flex gap-2">
               <a
                 href="/dashboard/interviews"
@@ -72,29 +72,31 @@ export default async function StudentDashboard() {
                 Edit Profile
               </a>
             </div>
-            <p className="text-2xl font-semibold pl-1">3</p>
           </div>
 
-          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
-                <Calendar size={18} />
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
+                  <Calendar size={18} />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Interviews Scheduled</span>
               </div>
-              <span className="text-sm font-medium text-neutral-400">Interviews Scheduled</span>
+              <p className="text-2xl font-semibold pl-1">1</p>
             </div>
-            <p className="text-2xl font-semibold pl-1">1</p>
-          </div>
 
-          <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
-                <UserCheck size={18} />
+            <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
+                  <UserCheck size={18} />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Profile Status</span>
               </div>
-              <span className="text-sm font-medium text-neutral-400">Profile Status</span>
+              <p className={`text-sm font-medium pl-1 ${isProfileComplete ? 'text-emerald-500' : 'text-amber-500'}`}>
+                {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
+              </p>
             </div>
-            <p className={`text-sm font-medium pl-1 ${isProfileComplete ? 'text-emerald-500' : 'text-amber-500'}`}>
-              {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
-            </p>
           </div>
         </div>
 
