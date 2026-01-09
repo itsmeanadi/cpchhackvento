@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { getAllJobs } from "@/lib/jobs";
 import { Navbar } from "@/components/navbar";
-import { Briefcase, Calendar, CheckCircle, AlertTriangle, ArrowRight, Download } from "lucide-react";
+import { Briefcase, Calendar, CheckCircle, AlertTriangle, ArrowRight, Download, Sparkles } from "lucide-react";
 
 export default async function StudentDashboard() {
   const session = await auth();
@@ -53,17 +53,35 @@ export default async function StudentDashboard() {
             </p>
           </div>
 
-          {!isProfileComplete && (
-            <div className="bg-amber-900/20 border border-amber-900/50 rounded-lg p-4 flex items-start gap-3 max-w-md">
-              <AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-500">Complete Profile</p>
-                <p className="text-sm text-amber-500/80 mt-1">
-                  Please <a href="/profile/edit" className="underline hover:text-amber-400">update your academic details</a> to apply for jobs.
-                </p>
-              </div>
+          <div className="flex flex-col items-start md:items-end gap-3">
+            <div className="flex gap-2">
+              <a
+                href="/dashboard/resume"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+              >
+                <Sparkles size={16} />
+                AI Resume Doctor
+              </a>
+              <a
+                href="/profile/edit"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors border border-neutral-700"
+              >
+                Edit Profile
+              </a>
             </div>
-          )}
+
+            {!isProfileComplete && (
+              <div className="bg-amber-900/20 border border-amber-900/50 rounded-lg p-4 flex items-start gap-3 max-w-md">
+                <AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-500">Complete Profile</p>
+                  <p className="text-sm text-amber-500/80 mt-1">
+                    Please <a href="/profile/edit" className="underline hover:text-amber-400">update your academic details</a> to apply for jobs.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Stats Grid - Cleaner, Solid Cards */}
