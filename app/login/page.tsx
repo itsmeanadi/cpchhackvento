@@ -6,6 +6,10 @@ import { GuestLoginButtons } from "./guest-buttons";
 export default async function LoginPage() {
   const session = await auth();
 
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="min-h-screen w-full flex items-center justify-center bg-neutral-950 text-white">
       {/* Simple clean container */}

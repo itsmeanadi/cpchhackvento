@@ -56,6 +56,13 @@ export default async function StudentDashboard() {
           <div className="flex flex-col items-start md:items-end gap-3">
             <div className="flex gap-2">
               <a
+                href="/dashboard/interviews"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-emerald-500/20"
+              >
+                <Calendar size={16} />
+                My Interviews
+              </a>
+              <a
                 href="/dashboard/resume"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
               >

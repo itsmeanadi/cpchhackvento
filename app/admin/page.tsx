@@ -24,9 +24,20 @@ export default async function AdminDashboard() {
             <h1 className="text-2xl font-bold text-gray-900">Placement Control Center</h1>
             <p className="text-gray-500">Manage companies, students, and notices.</p>
           </div>
-          <Link href="/admin/post-job" className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-            + Post New Job
-          </Link>
+          <div className="flex gap-3">
+            <Link 
+              href="/admin/schedule-interview" 
+              className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+            >
+              📅 Schedule Interview
+            </Link>
+            <Link 
+              href="/admin/post-job" 
+              className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+            >
+              + Post New Job
+            </Link>
+          </div>
         </header>
 
         <div className="grid gap-6 md:grid-cols-2">

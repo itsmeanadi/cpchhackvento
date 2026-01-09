@@ -6,6 +6,7 @@ import { getAdminDb } from "@/lib/firebase-admin";
 const ADMIN_EMAILS = ["tpo@ietdavv.edu.in", "hod.cs@ietdavv.edu.in", "1anadi1sharma@gmail.com"];
 
 export const authConfig = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -115,7 +116,28 @@ export const authConfig = {
 import { getServerSession } from "next-auth/next";
 
 // Wrapper for getServerSession to verify/mock v5-like behavior
-export const auth = () => getServerSession(authConfig);
+export const auth = async () => {
+  // Temporarily suppress NextAuth JWT_SESSION_ERROR console logs
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    // Filter out NextAuth JWT_SESSION_ERROR from stale cookies
+    const message = String(args[0] || '');
+    if (message.includes('JWT_SESSION_ERROR') || message.includes('decryption operation failed')) {
+      return; // Suppress this specific error
+    }
+    originalError.apply(console, args);
+  };
+
+  try {
+    return await getServerSession(authConfig);
+  } catch (error) {
+    // Return null for invalid/stale sessions
+    return null;
+  } finally {
+    // Always restore original console.error
+    console.error = originalError;
+  }
+};
 
 // signIn and signOut are usually client-side in v4, so we don't export them for server use
 // unless we want to implement server-side logic, but for now removing the v5 exports.
