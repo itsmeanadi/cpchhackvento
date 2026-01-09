@@ -227,7 +227,7 @@ export default function PostJobPage() {
                             <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
                                 <input
                                     type="file"
-                                    accept=".pdf, .doc, .docx"
+                                    accept=".doc, .docx"
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                                 />
@@ -238,7 +238,7 @@ export default function PostJobPage() {
                                     <p className="text-sm font-medium text-gray-900">
                                         {file ? file.name : "Click to upload perks/details PDF"}
                                     </p>
-                                    <p className="text-xs text-gray-500 mt-1">PDF, DOC up to 5MB</p>
+                                    <p className="text-xs text-gray-500 mt-1">txt, DOC up to 5MB</p>
                                 </div>
                             </div>
                         </div>
