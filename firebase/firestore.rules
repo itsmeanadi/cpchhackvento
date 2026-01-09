@@ -1,16 +1,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ALLOW PUBLIC ACCESS FOR JOBS (PROTOTYPE MODE)
+    // In production, this should be restricted to admins
+    match /jobs/{jobId} {
+      allow read, write: if true;
+    }
+
     // Allow users to read/write their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.token.email == userId;
     }
     
-    // Admins can read all users (write handled by admin SDK server-side)
+    // Admins can read all users
     match /users/{userId} {
       allow read: if request.auth != null && 
         (request.auth.token.email == 'tpo@ietdavv.edu.in' || 
-         request.auth.token.email == 'hod.cs@ietdavv.edu.in');
+         request.auth.token.email == 'hod.cs@ietdavv.edu.in' ||
+         request.auth.token.email == '1anadi1sharma@gmail.com');
     }
   }
 }
