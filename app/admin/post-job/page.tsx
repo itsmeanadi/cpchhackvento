@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { db, storage } from "@/lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ArrowLeft, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft, Loader2, UploadCloud } from "lucide-react";
 
 export default function PostJobPage() {
     const router = useRouter();
@@ -20,7 +20,7 @@ export default function PostJobPage() {
         min12th: 60,
         minCGPA: 7.0,
         gender: "Any",
-        description: "", // Fallback or additional comments
+        description: "",
     });
 
     const [file, setFile] = useState<File | null>(null);
@@ -32,32 +32,28 @@ export default function PostJobPage() {
         try {
             let documentUrl = "";
 
-            // 1. Upload Document if exists
             if (file) {
                 const storageRef = ref(storage, `job-docs/${Date.now()}-${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
                 documentUrl = await getDownloadURL(snapshot.ref);
             }
 
-            // 2. Save to Firestore
             await addDoc(collection(db, "jobs"), {
                 ...formData,
-                skills: formData.skills.split(",").map(s => s.trim()), // storage as array
+                skills: formData.skills.split(",").map(s => s.trim()),
                 documentUrl,
                 createdAt: new Date(),
                 status: "active"
             });
 
             setIsSuccess(true);
-
-            // Reset form after 2 seconds or redirect
             setTimeout(() => {
                 router.push("/admin");
             }, 2000);
 
         } catch (error) {
-            console.error("Error posting job:", error);
-            alert("Failed to post job. Check console for details.");
+            console.error(error);
+            alert("Failed to post job. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -65,90 +61,59 @@ export default function PostJobPage() {
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-xl border border-gray-100">
-                    <div className="mb-6 flex justify-center">
-                        <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center">
-                            <CheckCircle className="h-10 w-10 text-green-600" />
-                        </div>
+            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+                <div className="text-center space-y-4 animate-fade-in">
+                    <div className="h-16 w-16 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Job Posted!</h2>
-                    <p className="text-gray-500 mb-8">Successfully broadcasted {formData.companyName} opportunity to students.</p>
-                    <button
-                        onClick={() => router.push("/admin")}
-                        className="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-all"
-                    >
-                        Return to Dashboard
-                    </button>
+                    <h2 className="text-2xl font-bold text-white">Job Posted Successfully</h2>
+                    <p className="text-neutral-400">Redirecting you to the dashboard...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#050505] text-white p-8">
+
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
-                    <Link
-                        href="/admin"
-                        className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
-                    >
-                        <ArrowLeft size={16} className="mr-2" />
-                        Back to Dashboard
+                    <Link href="/admin" className="inline-flex items-center text-sm text-neutral-500 hover:text-white transition-colors">
+                        <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Post New Opportunity</h1>
-                                <p className="text-sm text-gray-500 mt-1">Create a new job listing for students.</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({
-                                    companyName: "Google",
-                                    skills: "Data Structures, Algorithms, System Design",
-                                    min10th: 90,
-                                    min12th: 90,
-                                    minCGPA: 8.5,
-                                    gender: "Any",
-                                    description: "Software Engineer Role",
-                                })}
-                                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors"
-                            >
-                                Demo Fill
-                            </button>
-                        </div>
-                    </div>
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-white">Post New Opportunity</h1>
+                    <p className="text-neutral-400 text-sm mt-1">Create a new job listing for students.</p>
+                </div>
 
-                    <form onSubmit={handleSubmit} className="p-8 space-y-8">
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 shadow-sm">
+                    <form onSubmit={handleSubmit} className="space-y-8">
 
-                        {/* Company Details */}
-                        <div className="space-y-6">
-                            <h3 className="text-sm uppercase tracking-wider text-gray-500 font-semibold">Company Details</h3>
+                        {/* Section 1 */}
+                        <div className="space-y-5">
+                            <h3 className="text-sm font-medium text-white uppercase tracking-wider">Company Details</h3>
 
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm text-neutral-400 mb-2">Company Name</label>
                                     <input
                                         required
                                         type="text"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none"
-                                        placeholder="e.g. Google, Microsoft, TCS"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-neutral-700"
+                                        placeholder="e.g. Google"
                                         value={formData.companyName}
                                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                                     />
                                 </div>
-
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Required Skills (Comma separated)</label>
+                                <div>
+                                    <label className="block text-sm text-neutral-400 mb-2">Required Skills</label>
                                     <input
                                         required
                                         type="text"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none"
-                                        placeholder="e.g. React, Node.js, Python, DSA"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-neutral-700"
+                                        placeholder="React, Node.js..."
                                         value={formData.skills}
                                         onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                                     />
@@ -156,57 +121,43 @@ export default function PostJobPage() {
                             </div>
                         </div>
 
-                        <div className="h-px bg-gray-100" />
+                        <div className="h-px bg-neutral-800" />
 
-                        {/* Eligibility Criteria */}
-                        <div className="space-y-6">
-                            <h3 className="text-sm uppercase tracking-wider text-gray-500 font-semibold">Eligibility Criteria</h3>
-
-                            <div className="grid gap-6 md:grid-cols-3">
+                        {/* Section 2 */}
+                        <div className="space-y-5">
+                            <h3 className="text-sm font-medium text-white uppercase tracking-wider">Eligibility Criteria</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Min 10th %</label>
+                                    <label className="block text-sm text-neutral-400 mb-2">Min 10th %</label>
                                     <input
-                                        required
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none"
+                                        required type="number"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-all"
                                         value={formData.min10th}
                                         onChange={(e) => setFormData({ ...formData, min10th: Number(e.target.value) })}
                                     />
                                 </div>
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Min 12th %</label>
+                                    <label className="block text-sm text-neutral-400 mb-2">Min 12th %</label>
                                     <input
-                                        required
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none"
+                                        required type="number"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-all"
                                         value={formData.min12th}
                                         onChange={(e) => setFormData({ ...formData, min12th: Number(e.target.value) })}
                                     />
                                 </div>
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Min CGPA</label>
+                                    <label className="block text-sm text-neutral-400 mb-2">Min CGPA</label>
                                     <input
-                                        required
-                                        type="number"
-                                        min="0"
-                                        max="10"
-                                        step="0.1"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none"
+                                        required type="number" step="0.1"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-all"
                                         value={formData.minCGPA}
                                         onChange={(e) => setFormData({ ...formData, minCGPA: Number(e.target.value) })}
                                     />
                                 </div>
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender Allowed</label>
+                                    <label className="block text-sm text-neutral-400 mb-2">Gender</label>
                                     <select
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all outline-none bg-white"
+                                        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-all"
                                         value={formData.gender}
                                         onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                                     >
@@ -218,44 +169,44 @@ export default function PostJobPage() {
                             </div>
                         </div>
 
-                        <div className="h-px bg-gray-100" />
+                        <div className="h-px bg-neutral-800" />
 
-                        {/* Document Upload */}
-                        <div className="space-y-6">
-                            <h3 className="text-sm uppercase tracking-wider text-gray-500 font-semibold">Job Details Document</h3>
-
-                            <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                        {/* Section 3 */}
+                        <div className="space-y-5">
+                            <h3 className="text-sm font-medium text-white uppercase tracking-wider">Documents</h3>
+                            <div className="border-2 border-dashed border-neutral-800 rounded-xl p-8 text-center hover:bg-neutral-800/30 transition-colors cursor-pointer group">
                                 <input
                                     type="file"
-                                    accept=".doc, .docx"
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    accept=".doc,.docx,.pdf"
+                                    className="hidden"
+                                    id="file-upload"
                                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                                 />
-                                <div className="flex flex-col items-center">
-                                    <div className="bg-gray-100 p-3 rounded-full mb-3">
-                                        <Upload size={24} className="text-gray-600" />
+                                <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center">
+                                    <div className="h-10 w-10 bg-neutral-800 rounded-full flex items-center justify-center mb-3 group-hover:bg-neutral-700 transition-colors">
+                                        <UploadCloud size={20} className="text-neutral-400" />
                                     </div>
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {file ? file.name : "Click to upload perks/details PDF"}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1">txt, DOC up to 5MB</p>
-                                </div>
+                                    <span className="text-sm font-medium text-white">
+                                        {file ? file.name : "Click to upload JD / Perks PDF"}
+                                    </span>
+                                    <span className="text-xs text-neutral-500 mt-1">PDF, DOC up to 5MB</span>
+                                </label>
                             </div>
                         </div>
 
-                        {/* Submit */}
                         <div className="pt-4">
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed transition-all shadow-lg shadow-black/10"
+                                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-lg shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                             >
-                                {isLoading ? "Posting Job..." : "Publish Job Post"}
+                                {isLoading ? <Loader2 size={18} className="animate-spin" /> : "Publish Opportunity"}
                             </button>
                         </div>
 
                     </form>
                 </div>
+
             </div>
         </div>
     );
