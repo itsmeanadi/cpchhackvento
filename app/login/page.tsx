@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { GoogleSignInButton } from "./google-button";
+
+export const dynamic = "force-dynamic";
 import { GuestLoginButtons } from "./guest-buttons";
 
 export default async function LoginPage() {
