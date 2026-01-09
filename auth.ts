@@ -1,8 +1,9 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
 import { getAdminDb } from "@/lib/firebase-admin";
 
-const ADMIN_EMAILS = ["tpo@ietdavv.edu.in", "hod.cs@ietdavv.edu.in"];
+const ADMIN_EMAILS = ["tpo@ietdavv.edu.in", "hod.cs@ietdavv.edu.in", "1anadi1sharma@gmail.com"];
 
 export const authConfig = {
   providers: [
@@ -10,10 +11,38 @@ export const authConfig = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    Credentials({
+      name: "Guest Access",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        role: { label: "Role", type: "text" },
+      },
+      authorize: async (credentials) => {
+        if (!credentials) return null;
+
+        const { email, role } = credentials;
+
+        if (email === "guest_admin@example.com" || email === "guest_student@example.com") {
+          return {
+            id: email,
+            email: email,
+            name: role === "admin" ? "Guest Admin" : "Guest Student",
+            image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
+            role: role,
+          };
+        }
+        return null;
+      },
+    }),
   ],
   callbacks: {
     async signIn({ user }: any) {
       if (!user?.email) return false;
+
+      // Allow Guest Users
+      if (user.email === "guest_admin@example.com" || user.email === "guest_student@example.com") {
+        return true;
+      }
 
       const isAllowedDomain = user.email.toLowerCase().endsWith("@ietdavv.edu.in");
       const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
@@ -61,9 +90,15 @@ export const authConfig = {
     async jwt({ token, user }: any) {
       if (user?.email) {
         // Update role based on email
-        token.role = ADMIN_EMAILS.includes(user.email)
-          ? "admin"
-          : "student";
+        if (user.email === "guest_admin@example.com") {
+          token.role = "admin";
+        } else if (user.email === "guest_student@example.com") {
+          token.role = "student";
+        } else {
+          token.role = ADMIN_EMAILS.includes(user.email)
+            ? "admin"
+            : "student";
+        }
       }
       return token;
     },

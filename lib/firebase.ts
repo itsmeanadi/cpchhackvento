@@ -10,6 +10,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+import { getStorage } from "firebase/storage";
+
 // Singleton pattern to prevent multiple initializations in Next.js
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const db = getFirestore(app);
+export const storage = getStorage(app);

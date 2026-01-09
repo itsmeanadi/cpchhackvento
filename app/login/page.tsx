@@ -1,75 +1,51 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { GoogleSignInButton } from "./google-button"; // Client component below
+import { GoogleSignInButton } from "./google-button";
+import { GuestLoginButtons } from "./guest-buttons";
 
 export default async function LoginPage() {
   const session = await auth();
 
-  /* 
-  // Redundant redirect handled by middleware. 
-  // keeping this commented out to prevent infinite loops if middleware / page session states drift.
-  if (session?.user) {
-    if (session.user.role === "admin") {
-      redirect("/admin");
-    } else {
-      redirect("/dashboard");
-    }
-  } 
-  */
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-brand-200/20 blur-[120px]" />
-        <div className="absolute top-[40%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-200/20 blur-[100px]" />
-      </div>
+    <main className="min-h-screen w-full flex items-center justify-center bg-neutral-950 text-white">
+      {/* Simple clean container */}
+      <div className="w-full max-w-sm p-6">
 
-      <div className="w-full max-w-md p-6 relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-200/50 border border-white/50 p-8 sm:p-10 animate-slide-up">
+        {/* Simple Card */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 shadow-sm">
 
-          {/* Branding Section */}
-          <div className="text-center mb-10">
-            <div className="mx-auto h-14 w-14 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-brand-500/30 ring-1 ring-black/5 transform rotate-3">
-              <span className="text-white font-bold text-lg tracking-tight">CPC</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-sans">
-              Welcome Back
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
+              CPC Access
             </h2>
-            <p className="mt-3 text-sm text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">
-              Login to access the Central Placement Cell portal and manage your journey.
+            <p className="text-neutral-400 text-sm">
+              Placement Portal • IET DAVV
             </p>
           </div>
 
-          {/* Action Section */}
           <div className="space-y-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-white px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Secure Access
-                </span>
-              </div>
+            <div>
+              <GoogleSignInButton />
             </div>
 
-            <GoogleSignInButton />
+            <div className="relative flex py-2 items-center">
+              <div className="flex-grow border-t border-neutral-800"></div>
+              <span className="flex-shrink-0 mx-4 text-xs text-neutral-600 font-medium uppercase">Prototype Demo</span>
+              <div className="flex-grow border-t border-neutral-800"></div>
+            </div>
 
-            <div className="text-center pt-2">
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Restricted to <span className="font-semibold text-brand-600">@ietdavv.edu.in</span> accounts.
-                <br />
-                Contact TPO for access issues.
-              </p>
+            <div>
+              <GuestLoginButtons />
             </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <p className="text-center mt-8 text-xs text-slate-400 font-medium opacity-60">
-          &copy; {new Date().getFullYear()} Placement Cell. All rights reserved.
-        </p>
+          <div className="mt-8 text-center">
+            <p className="text-xs text-neutral-600">
+              Restricted to @ietdavv.edu.in
+            </p>
+          </div>
+
+        </div>
       </div>
     </main>
   );
