@@ -20,13 +20,18 @@ export default async function LoginPage() {
         {/* Simple Card */}
         <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 shadow-sm">
 
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
               CPC Access
             </h2>
-            <p className="text-neutral-400 text-sm">
+            <p className="text-neutral-400 text-sm mb-4">
               Placement Portal • IET DAVV
             </p>
+
+            <div className="bg-neutral-800/50 rounded-lg p-3 text-s text-left text-neutral-400 space-y-1 border border-neutral-800">
+              <p>🔹 <strong className="text-neutral-300">Admin:</strong> Configurable for any email.</p>
+              <p>🔹 <strong className="text-neutral-300">Student:</strong> Restricted to <span className="text-indigo-400">@ietdavv.edu.in</span>.</p>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -45,9 +50,9 @@ export default async function LoginPage() {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-xs text-neutral-600">
-              Restricted to @ietdavv.edu.in
+          <div className="mt-8 text-center space-y-2">
+            <p className="text-s text-neutral-500">
+              For prototype testing, check <strong>Guest Access</strong> above.
             </p>
           </div>
 
