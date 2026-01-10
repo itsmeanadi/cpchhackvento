@@ -117,7 +117,7 @@ export default function ResumeAnalyzerPage() {
                                 {file ? file.name : "Upload your resume"}
                             </h3>
                             <p className="text-sm text-neutral-500">
-                                {file ? "Ready to analyze" : "Drag and drop or click to browse (PDF, DOCX)"}
+                                {file ? "Ready to analyze" : "Drag and drop or click to browse (TXT, DOCX)"}
                             </p>
                         </div>
                     </div>
