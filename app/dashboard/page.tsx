@@ -19,10 +19,10 @@ export default async function StudentDashboard() {
   // Determine if Guest
   const isGuest = session.user.email === "guest_student@example.com";
 
-  const adminDb = getAdminDb();
   let userData;
 
   try {
+    const adminDb = getAdminDb();
     const userRef = adminDb.collection("users").doc(session.user.email!);
     const userSnap = await userRef.get();
 
