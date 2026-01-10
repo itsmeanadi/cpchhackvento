@@ -57,6 +57,7 @@ export default async function StudentDashboard() {
       ...userData,
       createdAt: userData.createdAt?.toDate?.().toISOString() || null,
       updatedAt: userData.updatedAt?.toDate?.().toISOString() || null,
+      lastLogin: userData.lastLogin?.toDate?.().toISOString() || null,
     } as any;
   }
 
