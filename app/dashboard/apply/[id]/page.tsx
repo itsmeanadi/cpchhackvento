@@ -148,7 +148,7 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                 </a>
                             ) : (
                                 <div className="space-y-3">
-                                    <ConfirmApplicationButton />
+                                    <ConfirmApplicationButton jobId={id} />
                                     <p className="text-xs text-center text-neutral-500">
                                         Your currently saved resume will be sent.
                                     </p>

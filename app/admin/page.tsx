@@ -56,6 +56,7 @@ export default async function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicants</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -73,9 +74,17 @@ export default async function AdminDashboard() {
                           Active
                         </span>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Link
+                          href={`/admin/jobs/${job.id}/applications`}
+                          className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+                        >
+                          View Applicants
+                        </Link>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {job.documentUrl && (
-                          <a href={job.documentUrl} target="_blank" className="text-indigo-600 hover:text-indigo-900">View Doc</a>
+                          <a href={job.documentUrl} target="_blank" className="text-gray-500 hover:text-gray-900">View Doc</a>
                         )}
                       </td>
                     </tr>

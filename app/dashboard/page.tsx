@@ -59,6 +59,13 @@ export default async function StudentDashboard() {
                 My Interviews
               </a>
               <a
+                href="/dashboard/applications"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-blue-500/20"
+              >
+                <Briefcase size={16} />
+                My Applications
+              </a>
+              <a
                 href="/dashboard/resume"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
               >
