@@ -1,17 +1,29 @@
 import { auth } from "@/auth";
 import { getJobById } from "@/lib/jobs";
+import { getAdminDb } from "@/lib/firebase-admin";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConfirmApplicationButton } from "./confirm-button";
-import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle } from "lucide-react";
 
 export default async function ApplicationPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
-    if (!session?.user) redirect("/login");
+    if (!session?.user?.email) redirect("/login");
 
     const { id } = await params;
     const job = await getJobById(id);
+
+    // Check if applied
+    const adminDb = getAdminDb();
+    const appQuery = await adminDb
+        .collection("applications")
+        .where("userId", "==", session.user.email)
+        .where("jobId", "==", id)
+        .limit(1)
+        .get();
+
+    const hasApplied = !appQuery.empty;
 
     if (!job) {
         return (
@@ -146,6 +158,11 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                 >
                                     Download JD
                                 </a>
+                            ) : hasApplied ? (
+                                <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-6 py-3 rounded-xl border border-green-500/20">
+                                    <CheckCircle size={20} />
+                                    <span className="font-bold">Already Applied</span>
+                                </div>
                             ) : (
                                 <div className="space-y-3">
                                     <ConfirmApplicationButton jobId={id} />

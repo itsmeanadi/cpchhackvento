@@ -18,15 +18,46 @@ export default async function StudentDashboard() {
 
   // Determine if Guest
   const isGuest = session.user.email === "guest_student@example.com";
+
+  const adminDb = getAdminDb();
   let userData;
 
-  if (isGuest) {
-    userData = { name: "Guest Student", isProfileComplete: true };
-  } else {
-    const adminDb = getAdminDb();
+  try {
     const userRef = adminDb.collection("users").doc(session.user.email!);
     const userSnap = await userRef.get();
-    userData = userSnap.data();
+
+    if (userSnap.exists) {
+      userData = userSnap.data();
+    } else if (isGuest) {
+      // Fallback for Guest if not yet initialized in DB
+      userData = { name: "Guest Student", isProfileComplete: true, cgpa: "8.5" };
+    }
+  } catch (err) {
+    console.error("Error fetching user data:", err);
+  }
+
+  // Fetch User Applications
+  let appliedJobIds: string[] = [];
+
+  try {
+    const adminDb = getAdminDb();
+    const appsSnap = await adminDb
+      .collection("applications")
+      .where("userId", "==", session.user.email)
+      .get();
+
+    appliedJobIds = appsSnap.docs.map(doc => doc.data().jobId);
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+  }
+
+  // Sanitize userData for Client Component
+  if (userData) {
+    userData = {
+      ...userData,
+      createdAt: userData.createdAt?.toDate?.().toISOString() || null,
+      updatedAt: userData.updatedAt?.toDate?.().toISOString() || null,
+    } as any;
   }
 
   const userSkills = (userData?.skills || []) as string[];
@@ -122,7 +153,7 @@ export default async function StudentDashboard() {
         </div>
 
         {/* Job Grid */}
-        <JobList jobs={jobs} userSkills={userSkills} />
+        <JobList jobs={jobs} userSkills={userSkills} appliedJobIds={appliedJobIds} userData={userData} />
 
       </main>
     </div>

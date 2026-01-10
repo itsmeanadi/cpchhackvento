@@ -47,6 +47,7 @@ export async function applyJob(jobId: string) {
 
         // 4. Revalidate
         revalidatePath("/dashboard/applications");
+        revalidatePath("/dashboard");
 
         return { success: true, message: "Application submitted successfully!" };
 

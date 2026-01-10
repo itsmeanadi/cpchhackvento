@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
 import Link from "next/link";
-import { ArrowLeft, Send, Mail, Bell, CheckSquare, Square, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, Mail, Bell, CheckSquare, Square, Loader2, Filter } from "lucide-react";
 
 interface Student {
     email: string;
     name: string;
     fcmToken?: string;
+    cgpa?: string;
 }
 
 export default function NotificationsPage() {
@@ -20,20 +20,34 @@ export default function NotificationsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
+    // Filters
+    const [minCgpa, setMinCgpa] = useState("");
+
     useEffect(() => {
-        // Fetch students (mock for now, real implementation needs an API or server action)
-        // For prototype, we simulated fetching. In real app, use SWR/Server Component.
         fetch("/api/users/students")
             .then(res => res.json())
             .then(data => setStudents(data))
             .catch(err => console.error(err));
     }, []);
 
+    const filteredStudents = students.filter(student => {
+        if (!minCgpa) return true;
+        const sCgpa = parseFloat(student.cgpa || "0");
+        const mCgpa = parseFloat(minCgpa);
+        return !isNaN(mCgpa) ? sCgpa >= mCgpa : true;
+    });
+
     const toggleSelectAll = () => {
-        if (selectedStudents.length === students.length) {
-            setSelectedStudents([]);
+        const filteredEmails = filteredStudents.map(s => s.email);
+        const allSelected = filteredEmails.every(email => selectedStudents.includes(email));
+
+        if (allSelected) {
+            // Deselect visible
+            setSelectedStudents(selectedStudents.filter(email => !filteredEmails.includes(email)));
         } else {
-            setSelectedStudents(students.map(s => s.email));
+            // Select all visible (union)
+            const newSelection = new Set([...selectedStudents, ...filteredEmails]);
+            setSelectedStudents(Array.from(newSelection));
         }
     };
 
@@ -95,18 +109,35 @@ export default function NotificationsPage() {
 
                 {/* LEFT: Student Selection */}
                 <div className="lg:col-span-1 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-[calc(100vh-140px)]">
-                    <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 className="font-semibold text-sm">Select Recipients</h3>
-                        <button onClick={toggleSelectAll} className="text-xs text-indigo-600 font-medium hover:underline">
-                            {selectedStudents.length === students.length ? "Deselect All" : "Select All"}
-                        </button>
+
+                    {/* Filter Section */}
+                    <div className="p-4 border-b border-gray-200 bg-gray-50 space-y-3">
+                        <div className="flex justify-between items-center">
+                            <h3 className="font-semibold text-sm">Select Recipients</h3>
+                            <button onClick={toggleSelectAll} className="text-xs text-indigo-600 font-medium hover:underline">
+                                {filteredStudents.length > 0 && filteredStudents.every(s => selectedStudents.includes(s.email)) ? "Deselect Visible" : "Select Visible"}
+                            </button>
+                        </div>
+
+                        <div className="relative">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                            <input
+                                type="number"
+                                placeholder="Min CGPA (e.g. 7.5)"
+                                value={minCgpa}
+                                onChange={(e) => setMinCgpa(e.target.value)}
+                                className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            />
+                        </div>
                     </div>
 
                     <div className="overflow-y-auto flex-1 p-2 space-y-1">
                         {students.length === 0 ? (
                             <div className="text-center py-8 text-gray-400 text-sm">Loading students...</div>
+                        ) : filteredStudents.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400 text-sm">No students match filter.</div>
                         ) : (
-                            students.map(student => (
+                            filteredStudents.map(student => (
                                 <div
                                     key={student.email}
                                     onClick={() => toggleStudent(student.email)}
@@ -118,7 +149,10 @@ export default function NotificationsPage() {
                                     }
                                     <div className="overflow-hidden">
                                         <p className="text-sm font-medium truncate text-gray-900">{student.name}</p>
-                                        <p className="text-xs text-gray-500 truncate">{student.email}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs text-gray-500 truncate">{student.email}</p>
+                                            <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 rounded">CGPA: {student.cgpa || 'N/A'}</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))
@@ -186,7 +220,7 @@ export default function NotificationsPage() {
                         onClick={handleSend}
                         disabled={isLoading || status === 'success'}
                         className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${status === 'success' ? 'bg-green-600 text-white cursor-default' :
-                                'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
+                            'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
                             }`}
                     >
                         {isLoading ? <Loader2 className="animate-spin" /> :

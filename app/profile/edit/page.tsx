@@ -3,7 +3,7 @@ import { getAdminDb } from "@/lib/firebase-admin";
 import { updateProfile } from "../actions";
 import { Navbar } from "@/components/navbar";
 import { Save, User, BookOpen, Link2 as LinkIcon, Sparkles, Layers } from "lucide-react";
-import { DemoFillButton } from "components/demo-fill-button"
+import { DemoFillButton } from "@/components/demo-fill-button";
 
 export default async function ProfileEditPage() {
   const session = await auth();
@@ -16,7 +16,7 @@ export default async function ProfileEditPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white selection:bg-indigo-500/30">
-      
+
       {/* [Background] */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] mask-image-gradient" />
@@ -28,7 +28,7 @@ export default async function ProfileEditPage() {
         <Navbar user={session.user} />
 
         <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-          
+
           {/* [Header] */}
           <div className="mb-12 animate-slide-up flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
@@ -48,7 +48,7 @@ export default async function ProfileEditPage() {
                 <span className="text-neutral-500"> Comprehensive profiles receive 40% more visibility.</span>
               </p>
             </div>
-            
+
             {/* [New Button] Placed here for easy access during demos */}
             <div className="mb-2">
               <DemoFillButton />
@@ -57,18 +57,18 @@ export default async function ProfileEditPage() {
 
           {/* [Card] Glassmorphism Container */}
           <div className="bg-neutral-900/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl shadow-black/50 animate-slide-up delay-100">
-            
+
             <form action={updateProfile}>
-              
-              <div className="divide-y divide-white/5">
-                
+
+              <div className="flex flex-col divide-y divide-white/5">
+
                 {/* Section 1: Personal Identity */}
                 <div className="p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-500">
                   <div className="flex items-center gap-3 mb-8">
                     <User size={20} className="text-indigo-400" />
                     <h2 className="text-xl font-medium tracking-tight text-white">Personal Identity</h2>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Mobile Number</label>
@@ -105,8 +105,8 @@ export default async function ProfileEditPage() {
                           <option value="Female" className="bg-neutral-900">Female</option>
                           <option value="Other" className="bg-neutral-900">Other</option>
                         </select>
-                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </div>
                       </div>
                     </div>
@@ -119,7 +119,7 @@ export default async function ProfileEditPage() {
                     <BookOpen size={20} className="text-indigo-400" />
                     <h2 className="text-xl font-medium tracking-tight text-white">Academic History</h2>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Branch</label>
@@ -136,8 +136,8 @@ export default async function ProfileEditPage() {
                           <option value="MECH" className="bg-neutral-900">Mechanical</option>
                           <option value="CIVIL" className="bg-neutral-900">Civil Engineering</option>
                         </select>
-                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </div>
                       </div>
                     </div>
@@ -171,7 +171,7 @@ export default async function ProfileEditPage() {
                   </div>
 
                   <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 mt-8">
-                     <div className="space-y-2">
+                    <div className="space-y-2">
                       <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">10th Grade (%)</label>
                       <input
                         type="number"
@@ -273,7 +273,7 @@ export default async function ProfileEditPage() {
                     type="submit"
                     className="group relative inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl text-sm font-bold tracking-wide overflow-hidden transition-all hover:bg-neutral-200 active:scale-95"
                   >
-                     <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Save size={16} className="relative z-10" />
                     <span className="relative z-10">Save Configuration</span>
                   </button>
