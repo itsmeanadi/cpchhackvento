@@ -6,6 +6,7 @@ export interface UserProfile {
     role: "student" | "admin";
     fcmToken?: string;
     cgpa?: string;
+    branch?: string;
 }
 
 export async function getAllStudents(): Promise<UserProfile[]> {

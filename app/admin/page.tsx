@@ -3,6 +3,8 @@ import { Navbar } from "@/components/navbar";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAllJobs } from "@/lib/jobs";
+import { getPlacementStats } from "@/lib/analytics";
+import { DashboardCharts } from "@/components/admin/dashboard-charts";
 
 export default async function AdminDashboard() {
   const session = await auth();
@@ -13,6 +15,7 @@ export default async function AdminDashboard() {
 
   // Unified Data Fetching
   const jobs = await getAllJobs();
+  const stats = await getPlacementStats();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,6 +46,10 @@ export default async function AdminDashboard() {
             + Post New Job
           </Link>
         </header>
+
+        <div className="mb-8">
+          <DashboardCharts stats={stats} />
+        </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2">

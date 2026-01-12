@@ -38,10 +38,23 @@ export async function POST(req: NextRequest) {
 
         try {
             if (file.type === "application/pdf") {
-                console.log("Parsing PDF...");
-                const pdf = require("pdf-parse");
-                const pdfData = await pdf(buffer);
-                text = pdfData.text;
+                console.log("Parsing PDF with pdf2json...");
+                const PDFParser = require("pdf2json");
+                const pdfParser = new PDFParser(null, 1); // 1 = Text mode
+
+                text = await new Promise((resolve, reject) => {
+                    pdfParser.on("pdfParser_dataError", (errData: any) => reject(new Error(errData.parserError)));
+                    pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+                        // Extract text from the raw data
+                        const rawText = pdfParser.getRawTextContent();
+                        resolve(rawText);
+                    });
+                    pdfParser.parseBuffer(buffer);
+                });
+
+                // Cleaning up text
+                text = text.replace(/\0/g, "").trim();
+                console.log(`PDF Parsed. Text Length: ${text.length}`);
 
             } else if (
                 file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
@@ -50,10 +63,12 @@ export async function POST(req: NextRequest) {
                 console.log("Parsing DOCX...");
                 const result = await mammoth.extractRawText({ buffer });
                 text = result.value;
+                console.log(`DOCX Parsed. Text Length: ${text.length}`);
 
             } else if (file.type === "text/plain") {
                 console.log("Reading Text file...");
                 text = buffer.toString("utf-8");
+                console.log(`TXT Read. Text Length: ${text.length}`);
 
             } else {
                 console.warn("Unsupported file format:", file.type);
@@ -66,6 +81,12 @@ export async function POST(req: NextRequest) {
 
         if (!text || text.length < 50) {
             console.warn("Extracted text is too short.");
+            // More specific error for PDFs
+            if (file.type === "application/pdf") {
+                return NextResponse.json({
+                    error: "The PDF appears to be empty or contains scanned images instead of text. Please upload a text-based PDF or a DOCX file."
+                }, { status: 400 });
+            }
             return NextResponse.json({ error: "Could not extract enough text from the file (minimum 50 chars)." }, { status: 400 });
         }
 

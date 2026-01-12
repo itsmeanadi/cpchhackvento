@@ -9,6 +9,7 @@ interface Student {
     name: string;
     fcmToken?: string;
     cgpa?: string;
+    branch?: string;
 }
 
 export default function NotificationsPage() {
@@ -20,8 +21,14 @@ export default function NotificationsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
-    // Filters
+    // Filters & Sorting
     const [minCgpa, setMinCgpa] = useState("");
+    const [selectedBranch, setSelectedBranch] = useState("");
+    const [sortBy, setSortBy] = useState<"name" | "cgpa" | "branch">("name");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+    // Derived state
+    const branches = Array.from(new Set(students.map(s => s.branch).filter(Boolean))) as string[];
 
     useEffect(() => {
         fetch("/api/users/students")
@@ -30,12 +37,42 @@ export default function NotificationsPage() {
             .catch(err => console.error(err));
     }, []);
 
-    const filteredStudents = students.filter(student => {
-        if (!minCgpa) return true;
-        const sCgpa = parseFloat(student.cgpa || "0");
-        const mCgpa = parseFloat(minCgpa);
-        return !isNaN(mCgpa) ? sCgpa >= mCgpa : true;
-    });
+    const filteredStudents = students
+        .filter(student => {
+            // 1. Min CGPA Filter
+            if (minCgpa) {
+                const sCgpa = parseFloat(student.cgpa || "0");
+                const mCgpa = parseFloat(minCgpa);
+                if (!isNaN(mCgpa) && sCgpa < mCgpa) return false;
+            }
+            // 2. Branch Filter
+            if (selectedBranch && student.branch !== selectedBranch) {
+                return false;
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            let valA, valB;
+
+            switch (sortBy) {
+                case "cgpa":
+                    valA = parseFloat(a.cgpa || "0");
+                    valB = parseFloat(b.cgpa || "0");
+                    break;
+                case "branch":
+                    valA = a.branch || "";
+                    valB = b.branch || "";
+                    break;
+                case "name":
+                default:
+                    valA = a.name.toLowerCase();
+                    valB = b.name.toLowerCase();
+            }
+
+            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+        });
 
     const toggleSelectAll = () => {
         const filteredEmails = filteredStudents.map(s => s.email);
@@ -107,7 +144,6 @@ export default function NotificationsPage() {
 
             <main className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* LEFT: Student Selection */}
                 <div className="lg:col-span-1 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-[calc(100vh-140px)]">
 
                     {/* Filter Section */}
@@ -119,6 +155,21 @@ export default function NotificationsPage() {
                             </button>
                         </div>
 
+                        {/* Branch Filter */}
+                        <div className="relative">
+                            <select
+                                value={selectedBranch}
+                                onChange={(e) => setSelectedBranch(e.target.value)}
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white"
+                            >
+                                <option value="">All Branches</option>
+                                {branches.map(branch => (
+                                    <option key={branch} value={branch}>{branch}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* CGPA Filter */}
                         <div className="relative">
                             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
                             <input
@@ -128,6 +179,27 @@ export default function NotificationsPage() {
                                 onChange={(e) => setMinCgpa(e.target.value)}
                                 className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
+                        </div>
+
+                        {/* Sort Controls */}
+                        <div className="flex gap-2">
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value as "name" | "cgpa" | "branch")}
+                                className="w-1/2 px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white"
+                            >
+                                <option value="name">Name</option>
+                                <option value="cgpa">CGPA</option>
+                                <option value="branch">Branch</option>
+                            </select>
+                            <select
+                                value={sortOrder}
+                                onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+                                className="w-1/2 px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white"
+                            >
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
                         </div>
                     </div>
 
@@ -147,19 +219,23 @@ export default function NotificationsPage() {
                                         <CheckSquare size={18} className="text-indigo-600" /> :
                                         <Square size={18} className="text-gray-300" />
                                     }
-                                    <div className="overflow-hidden">
-                                        <p className="text-sm font-medium truncate text-gray-900">{student.name}</p>
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-xs text-gray-500 truncate">{student.email}</p>
-                                            <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 rounded">CGPA: {student.cgpa || 'N/A'}</span>
+                                    <div className="overflow-hidden w-full">
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-sm font-medium truncate text-gray-900">{student.name}</p>
+                                            {student.cgpa && <span className="text-[10px] bg-green-50 text-green-700 px-1.5 rounded font-medium">{student.cgpa}</span>}
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs text-gray-500 mt-0.5">
+                                            <p className="truncate max-w-[120px]">{student.email}</p>
+                                            {student.branch && <span className="text-[10px] bg-gray-100 px-1.5 rounded">{student.branch}</span>}
                                         </div>
                                     </div>
                                 </div>
                             ))
                         )}
                     </div>
-                    <div className="p-4 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 text-center">
-                        {selectedStudents.length} recipients selected
+                    <div className="p-4 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 text-center flex justify-between">
+                        <span>{filteredStudents.length} visible</span>
+                        <span className="font-medium text-indigo-600">{selectedStudents.length} selected</span>
                     </div>
                 </div>
 

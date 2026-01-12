@@ -5,7 +5,7 @@ import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConfirmApplicationButton } from "./confirm-button";
-import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle } from "lucide-react";
 
 export default async function ApplicationPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
@@ -24,6 +24,15 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
         .get();
 
     const hasApplied = !appQuery.empty;
+
+    // Check Eligibility
+    const userDoc = await adminDb.collection("users").doc(session.user.email).get();
+    const userData = userDoc.data();
+    const userCgpa = parseFloat(userData?.cgpa || "0");
+    const requiredCgpa = parseFloat(job?.cgpa?.toString() || "0");
+
+    // Eligible if: Job has no CGPA req OR User meets req
+    const isEligible = !job?.cgpa || job.cgpa === "N/A" || isNaN(requiredCgpa) || userCgpa >= requiredCgpa;
 
     if (!job) {
         return (
@@ -162,6 +171,18 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                 <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-6 py-3 rounded-xl border border-green-500/20">
                                     <CheckCircle size={20} />
                                     <span className="font-bold">Already Applied</span>
+                                </div>
+                            ) : !isEligible ? (
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-red-400 bg-red-900/20 px-4 py-3 rounded-xl border border-red-900/30 text-sm">
+                                        <AlertTriangle size={18} className="shrink-0" />
+                                        <span className="font-medium">
+                                            Not Eligible: Requires {job.cgpa} CGPA (You: {userCgpa})
+                                        </span>
+                                    </div>
+                                    <button disabled className="w-full py-3 bg-neutral-800 text-neutral-500 font-bold rounded-xl cursor-not-allowed">
+                                        Application Locked
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="space-y-3">

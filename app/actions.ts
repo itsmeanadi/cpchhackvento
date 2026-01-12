@@ -35,7 +35,23 @@ export async function applyJob(jobId: string) {
             return { success: false, message: "You have already applied for this job." };
         }
 
-        // 3. Create Application
+        // 3. Verify Eligibility (CGPA)
+        const userDoc = await adminDb.collection("users").doc(userId).get();
+        const userData = userDoc.data();
+
+        if (job.cgpa && job.cgpa !== "N/A") {
+            const userCgpa = parseFloat(userData?.cgpa || "0");
+            const requiredCgpa = parseFloat(job.cgpa.toString());
+
+            if (!isNaN(requiredCgpa) && !isNaN(userCgpa) && userCgpa < requiredCgpa) {
+                return {
+                    success: false,
+                    message: `Not Eligible: Your CGPA (${userCgpa}) is below the required ${requiredCgpa}.`
+                };
+            }
+        }
+
+        // 4. Create Application
         await adminDb.collection("applications").add({
             userId,
             jobId,
@@ -43,6 +59,9 @@ export async function applyJob(jobId: string) {
             role: job.role,
             status: "Applied",
             appliedAt: new Date(),
+            studentName: userData?.name || "Unknown", // Store snapshot of name
+            studentCgpa: userData?.cgpa || "N/A", // Store snapshot of CGPA
+            studentBranch: userData?.branch || "N/A", // Store snapshot of Branch
         });
 
         // 4. Revalidate
