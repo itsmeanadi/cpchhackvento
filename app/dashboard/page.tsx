@@ -1,4 +1,3 @@
-```
 import { auth } from "@/auth";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { getAllJobs } from "@/lib/jobs";
@@ -163,12 +162,12 @@ export default async function StudentDashboard() {
             {/* Profile Status Card */}
             <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
-                <div className={`p - 2 rounded - md ${ isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500' } `}>
+                <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
                   <UserCheck size={18} />
                 </div>
                 <span className="text-sm font-medium text-neutral-400">Profile Status</span>
               </div>
-              <p className={`text - sm font - medium pl - 1 ${ isProfileComplete ? 'text-emerald-500' : 'text-amber-500' } `}>
+              <p className={`text-sm font-medium pl-1 ${isProfileComplete ? 'text-emerald-500' : 'text-amber-500'}`}>
                 {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
               </p>
             </div>
