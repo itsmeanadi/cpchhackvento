@@ -5,7 +5,7 @@ import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConfirmApplicationButton } from "./confirm-button";
-import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle, Star, Linkedin } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle, Star, Linkedin, BrainCircuit } from "lucide-react";
 import { getReviews, canReview } from "@/app/actions/reviews";
 import { ReviewForm } from "@/components/review-form";
 
@@ -248,6 +248,17 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                     </p>
                                 </div>
                             )}
+
+                            {/* AI Interview Button */}
+                            <div className="mt-4 pt-4 border-t border-neutral-800">
+                                <Link
+                                    href={`/dashboard/interview/${id}`}
+                                    className="flex items-center justify-center gap-2 w-full py-3 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 font-medium rounded-xl border border-indigo-500/20 transition-colors"
+                                >
+                                    <BrainCircuit size={18} />
+                                    Take AI Mock Interview
+                                </Link>
+                            </div>
 
                         </div>
                     </div>
