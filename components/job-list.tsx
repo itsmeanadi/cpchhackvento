@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Job } from "@/lib/jobs";
 import { ApplyButton } from "@/components/apply-button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Search } from "lucide-react";
 
 interface JobListProps {
     jobs: Job[];
@@ -14,12 +14,19 @@ interface JobListProps {
 
 export function JobList({ jobs, userSkills, appliedJobIds = [], userData }: JobListProps) {
     const [filter, setFilter] = useState<"all" | "eligible" | "applied" | "unapplied">("all");
+    const [searchQuery, setSearchQuery] = useState("");
 
     const filteredJobs = jobs.filter((job) => {
         const isApplied = appliedJobIds.includes(job.id);
         const userCgpa = parseFloat(userData?.cgpa || "0");
         const jobCgpa = parseFloat(job.cgpa as string) || 0;
         const isEligible = userCgpa >= jobCgpa;
+
+        const matchesSearch =
+            job.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            job.companyName.toLowerCase().includes(searchQuery.toLowerCase());
+
+        if (!matchesSearch) return false;
 
         if (filter === "applied") return isApplied;
         if (filter === "unapplied") return !isApplied;
@@ -29,6 +36,21 @@ export function JobList({ jobs, userSkills, appliedJobIds = [], userData }: JobL
 
     return (
         <div className="space-y-6">
+            {/* Search Header */}
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-semibold text-white">Latest Opportunities</h2>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search roles or companies..."
+                        className="bg-neutral-900 border border-neutral-800 rounded-md py-2 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-neutral-600 w-64 placeholder:text-neutral-500"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
+
             {/* Filter Tabs */}
             <div className="flex flex-wrap gap-2">
                 {(["all", "eligible", "applied", "unapplied"] as const).map((f) => (
@@ -36,8 +58,8 @@ export function JobList({ jobs, userSkills, appliedJobIds = [], userData }: JobL
                         key={f}
                         onClick={() => setFilter(f)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f
-                                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
-                                : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
+                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
+                            : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
                             } capitalize`}
                     >
                         {f}

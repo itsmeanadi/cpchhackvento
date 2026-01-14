@@ -3,7 +3,7 @@ import { getAdminDb } from "@/lib/firebase-admin";
 import { getAllJobs } from "@/lib/jobs";
 import { Navbar } from "@/components/navbar";
 import { ApplyButton } from "@/components/apply-button";
-import { Briefcase, Calendar, UserCheck, Sparkles, ArrowUpRight, Search } from "lucide-react";
+import { Briefcase, Calendar, UserCheck, Sparkles, ArrowUpRight } from "lucide-react";
 import { JobList } from "@/components/job-list";
 
 export default async function StudentDashboard() {
@@ -137,19 +137,6 @@ export default async function StudentDashboard() {
                 {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Job Listing Heading */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Latest Opportunities</h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
-            <input
-              type="text"
-              placeholder="Search roles..."
-              className="bg-neutral-900 border border-neutral-800 rounded-md py-2 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-neutral-600 w-64"
-            />
           </div>
         </div>
 
