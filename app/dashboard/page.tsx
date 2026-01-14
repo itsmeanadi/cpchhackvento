@@ -51,6 +51,19 @@ export default async function StudentDashboard() {
     console.error("Error fetching applications:", error);
   }
 
+  // Fetch Scheduled Interviews
+  let interviewCount = 0;
+  try {
+    const adminDb = getAdminDb();
+    const interviewsSnap = await adminDb
+      .collection("interviews")
+      .where("studentEmail", "==", session.user.email)
+      .get();
+    interviewCount = interviewsSnap.size;
+  } catch (error) {
+    console.error("Error fetching interviews:", error);
+  }
+
   // Sanitize userData for Client Component
   if (userData) {
     userData = {
@@ -115,7 +128,20 @@ export default async function StudentDashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+
+            {/* Applications Card */}
+            <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
+                  <Briefcase size={18} />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Applications Submitted</span>
+              </div>
+              <p className="text-2xl font-semibold pl-1">{appliedJobIds.length}</p>
+            </div>
+
+            {/* Interviews Card */}
             <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-neutral-800 rounded-md text-neutral-400">
@@ -123,9 +149,10 @@ export default async function StudentDashboard() {
                 </div>
                 <span className="text-sm font-medium text-neutral-400">Interviews Scheduled</span>
               </div>
-              <p className="text-2xl font-semibold pl-1">1</p>
+              <p className="text-2xl font-semibold pl-1">{interviewCount}</p>
             </div>
 
+            {/* Profile Status Card */}
             <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
