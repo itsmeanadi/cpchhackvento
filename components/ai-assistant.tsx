@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Send, User, Bot, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ interface Message {
 }
 
 export function AIAssistant() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         { role: "assistant", content: "Hi! I'm your Placement Assistant. How can I help you today?" }
@@ -61,6 +63,8 @@ export function AIAssistant() {
             setIsLoading(false);
         }
     };
+
+    if (pathname === "/login") return null;
 
     return (
         <>

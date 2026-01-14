@@ -12,6 +12,7 @@ export interface Review {
     reviewerBranch: string;
     rating: number;
     content: string;
+    linkedinUrl?: string;
     createdAt: string; // ISO String
 }
 

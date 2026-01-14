@@ -5,7 +5,7 @@ import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConfirmApplicationButton } from "./confirm-button";
-import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle, Star } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle, Star, Linkedin } from "lucide-react";
 import { getReviews, canReview } from "@/app/actions/reviews";
 import { ReviewForm } from "@/components/review-form";
 
@@ -163,6 +163,16 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                                     <span className="text-yellow-400 font-bold">{review.rating}</span>
                                                     <Star size={14} className="fill-yellow-400 text-yellow-400" />
                                                 </div>
+                                                {review.linkedinUrl && (
+                                                    <a
+                                                        href={review.linkedinUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="ml-3 text-blue-400 hover:text-blue-300 transition-colors"
+                                                    >
+                                                        <Linkedin size={20} />
+                                                    </a>
+                                                )}
                                             </div>
                                             <p className="text-neutral-300 leading-relaxed text-sm">{review.content}</p>
                                         </div>
