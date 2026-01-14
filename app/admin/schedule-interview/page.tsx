@@ -104,7 +104,7 @@ export default function ScheduleInterviewPage() {
                 type="button"
                 onClick={() =>
                   setFormData({
-                    studentEmail: "student@ietdavv.edu.in",
+                    ...formData,
                     companyName: "Google",
                     interviewType: "technical",
                     dateTime: "2026-01-15T10:00",
@@ -115,7 +115,7 @@ export default function ScheduleInterviewPage() {
                 }
                 className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium rounded-lg transition-colors"
               >
-                Demo Fill
+                Autofill Form
               </button>
             </div>
           </div>

@@ -5,7 +5,9 @@ import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ConfirmApplicationButton } from "./confirm-button";
-import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Clock, DollarSign, Users, CheckCircle, AlertTriangle, Star } from "lucide-react";
+import { getReviews, canReview } from "@/app/actions/reviews";
+import { ReviewForm } from "@/components/review-form";
 
 export default async function ApplicationPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
@@ -57,6 +59,10 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
     };
 
     const stats = getDemoStats(job.companyName);
+
+    // Fetch Reviews & Eligibility
+    const reviews = await getReviews(job.companyName);
+    const userCanReview = await canReview(job.companyName);
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-sans">
@@ -132,6 +138,46 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* [Reviews Section] */}
+                        <div className="mt-12 pt-8 border-t border-white/5">
+                            <h2 className="text-2xl font-semibold text-white mb-6">Student Reviews</h2>
+
+                            {/* Reviews List */}
+                            <div className="space-y-6 mb-10">
+                                {reviews.length > 0 ? (
+                                    reviews.map((review) => (
+                                        <div key={review.id} className="bg-neutral-900/30 border border-white/5 rounded-2xl p-6">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                                                        {review.reviewerName.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-white font-medium">{review.reviewerName}</h4>
+                                                        <p className="text-xs text-neutral-500">{review.reviewerBranch} • {new Date(review.createdAt).toLocaleDateString()}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20">
+                                                    <span className="text-yellow-400 font-bold">{review.rating}</span>
+                                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                                                </div>
+                                            </div>
+                                            <p className="text-neutral-300 leading-relaxed text-sm">{review.content}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-10 bg-neutral-900/30 rounded-2xl border border-dashed border-white/10">
+                                        <p className="text-neutral-500">No reviews yet for {job.companyName}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Add Review Form (Only if Eligible) */}
+                            {userCanReview && (
+                                <ReviewForm companyName={job.companyName} />
+                            )}
                         </div>
 
                     </div>

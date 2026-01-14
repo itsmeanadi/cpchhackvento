@@ -4,10 +4,16 @@ import { getJobApplications } from "@/lib/applications";
 import { getJobById } from "@/lib/jobs";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LayoutGrid, List } from "lucide-react";
 import { ApplicationStatusDropdown } from "./status-dropdown";
+import { KanbanBoard } from "./kanban-board";
 
-export default async function AdminJobApplicationsPage({ params }: { params: Promise<{ id: string }> }) {
+interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ view?: string }>;
+}
+
+export default async function AdminJobApplicationsPage({ params, searchParams }: PageProps) {
     const session = await auth();
 
     if (!session?.user || session.user.role !== "admin") {
@@ -15,6 +21,9 @@ export default async function AdminJobApplicationsPage({ params }: { params: Pro
     }
 
     const { id } = await params;
+    const { view } = await searchParams;
+    const isBoardView = view === "board";
+
     const job = await getJobById(id);
     const applications = await getJobApplications(id);
 
@@ -27,57 +36,81 @@ export default async function AdminJobApplicationsPage({ params }: { params: Pro
             <Navbar user={session.user} />
 
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link href="/admin" className="p-2 -ml-2 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors">
-                        <ArrowLeft size={20} />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{job.role} - {job.companyName}</h1>
-                        <p className="text-gray-500">Total Applicants: {applications.length}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div className="flex items-center gap-4">
+                        <Link href="/admin" className="p-2 -ml-2 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors">
+                            <ArrowLeft size={20} />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">{job.role} - {job.companyName}</h1>
+                            <p className="text-gray-500">Total Applicants: {applications.length}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex bg-white rounded-lg p-1 border border-gray-200 shadow-sm self-start">
+                        <Link
+                            href={`/admin/jobs/${id}/applications`}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!isBoardView ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            <List size={16} />
+                            List
+                        </Link>
+                        <Link
+                            href={`/admin/jobs/${id}/applications?view=board`}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isBoardView ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            <LayoutGrid size={16} />
+                            Board
+                        </Link>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant Email</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Status</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {applications.map((app) => (
-                                <tr key={app.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-gray-900">{app.userId}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {new Date(app.appliedAt).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <StatusBadge status={app.status} />
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                        <ApplicationStatusDropdown
-                                            applicationId={app.id}
-                                            currentStatus={app.status}
-                                            jobId={job.id}
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                            {applications.length === 0 && (
+                {isBoardView ? (
+                    <KanbanBoard initialApplications={applications} jobId={job.id} />
+                ) : (
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                                        No applications received yet.
-                                    </td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant Email</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied Date</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Status</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {applications.map((app) => (
+                                    <tr key={app.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900">{app.userId}</div>
+                                            {app.studentName && <div className="text-xs text-gray-500">{app.studentName}</div>}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {new Date(app.appliedAt).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <StatusBadge status={app.status} />
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <ApplicationStatusDropdown
+                                                applicationId={app.id}
+                                                currentStatus={app.status}
+                                                jobId={job.id}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                                {applications.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                                            No applications received yet.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </main>
         </div>
     );

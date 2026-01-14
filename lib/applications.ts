@@ -8,6 +8,9 @@ export interface Application {
     role: string;
     status: "Applied" | "Under Review" | "Interview Scheduled" | "Rejected" | "Selected";
     appliedAt: string; // ISO string
+    studentName?: string;
+    studentCgpa?: string;
+    studentBranch?: string;
 }
 
 export async function getUserApplications(userId: string): Promise<Application[]> {
@@ -31,6 +34,9 @@ export async function getUserApplications(userId: string): Promise<Application[]
                 role: data.role,
                 status: data.status,
                 appliedAt: data.appliedAt?.toDate ? data.appliedAt.toDate().toISOString() : new Date().toISOString(),
+                studentName: data.studentName,
+                studentCgpa: data.studentCgpa,
+                studentBranch: data.studentBranch,
             });
         });
 
@@ -63,6 +69,9 @@ export async function getJobApplications(jobId: string): Promise<Application[]> 
                 role: data.role,
                 status: data.status,
                 appliedAt: data.appliedAt?.toDate ? data.appliedAt.toDate().toISOString() : new Date().toISOString(),
+                studentName: data.studentName,
+                studentCgpa: data.studentCgpa,
+                studentBranch: data.studentBranch,
             });
         });
 
