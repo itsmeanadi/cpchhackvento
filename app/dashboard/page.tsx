@@ -1,9 +1,10 @@
+```
 import { auth } from "@/auth";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { getAllJobs } from "@/lib/jobs";
 import { Navbar } from "@/components/navbar";
 import { ApplyButton } from "@/components/apply-button";
-import { Briefcase, Calendar, UserCheck, Sparkles, ArrowUpRight } from "lucide-react";
+import { Briefcase, Calendar, UserCheck, Sparkles, ArrowUpRight, BarChart3 } from "lucide-react";
 import { JobList } from "@/components/job-list";
 
 export default async function StudentDashboard() {
@@ -119,6 +120,13 @@ export default async function StudentDashboard() {
                 AI Resume Doctor
               </a>
               <a
+                href="/dashboard/analytics"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-purple-500/20"
+              >
+                <BarChart3 size={16} />
+                Analytics
+              </a>
+              <a
                 href="/profile/edit"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium rounded-lg transition-colors border border-neutral-700"
               >
@@ -155,12 +163,12 @@ export default async function StudentDashboard() {
             {/* Profile Status Card */}
             <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
-                <div className={`p-2 rounded-md ${isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500'}`}>
+                <div className={`p - 2 rounded - md ${ isProfileComplete ? 'bg-emerald-900/20 text-emerald-500' : 'bg-amber-900/20 text-amber-500' } `}>
                   <UserCheck size={18} />
                 </div>
                 <span className="text-sm font-medium text-neutral-400">Profile Status</span>
               </div>
-              <p className={`text-sm font-medium pl-1 ${isProfileComplete ? 'text-emerald-500' : 'text-amber-500'}`}>
+              <p className={`text - sm font - medium pl - 1 ${ isProfileComplete ? 'text-emerald-500' : 'text-amber-500' } `}>
                 {isProfileComplete ? 'Complete & Verified' : 'Action Required'}
               </p>
             </div>

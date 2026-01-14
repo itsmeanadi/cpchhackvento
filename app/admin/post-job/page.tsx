@@ -83,9 +83,26 @@ export default function PostJobPage() {
                     </Link>
                 </div>
 
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">Post New Opportunity</h1>
-                    <p className="text-gray-500 text-sm mt-1">Create a new job listing for students.</p>
+                <div className="mb-8 flex justify-between items-end">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Post New Opportunity</h1>
+                        <p className="text-gray-500 text-sm mt-1">Create a new job listing for students.</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setFormData({
+                            companyName: "Google",
+                            skills: "React, Node.js, TypeScript, SQL",
+                            min10th: 85,
+                            min12th: 85,
+                            minCGPA: 8.0,
+                            gender: "Any",
+                            description: "Seeking a passionate Software Engineer...",
+                        })}
+                        className="text-sm text-indigo-600 hover:text-indigo-700 font-medium bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                        Demo Fill
+                    </button>
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">

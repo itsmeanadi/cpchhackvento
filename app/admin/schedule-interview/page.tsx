@@ -20,6 +20,25 @@ export default function ScheduleInterviewPage() {
     notes: "",
   });
 
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCsvFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        // Simple regex to find the first email in the CSV
+        const emailMatch = text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+        if (emailMatch && emailMatch[0]) {
+          setFormData((prev) => ({ ...prev, studentEmail: emailMatch[0] }));
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
