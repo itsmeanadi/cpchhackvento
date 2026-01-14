@@ -22,7 +22,6 @@ export async function getReviews(companyName: string): Promise<Review[]> {
         const snapshot = await adminDb
             .collection("reviews")
             .where("companyName", "==", companyName)
-            .orderBy("createdAt", "desc")
             .get();
 
         return snapshot.docs.map(doc => ({
