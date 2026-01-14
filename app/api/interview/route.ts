@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
         1. Start by introducing yourself and asking the candidate to introduce themselves.
         2. FOR EVERY USER ANSWER (except the initial introduction), you MUST follow this EXACT format:
            
-           **Your Answer Score:** [0-10]/10
-           **Improved Version:** [A concise, better way to answer the previous question]
-           **Next Question:** [Your next technical or situational question]
+           Your Answer Score: [0-10]/10
+           Improved Version: [A concise, better way to answer the previous question]
+           Next Question: [Your next technical or situational question]
 
         3. If the user's answer is correct, give a high score and briefly explain why.
         4. If incorrect, give a low score, explain the concept in "Improved Version".
